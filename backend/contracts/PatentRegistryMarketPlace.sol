@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 import {PatentNFT} from "./PatentNFT.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-
 contract PatentRegistryMarketPlace {
     using Counters for Counters.Counter;
 
@@ -74,14 +73,25 @@ contract PatentRegistryMarketPlace {
     );
     event DisputeResolved(uint256 indexed disputeId);
 
-    constructor() payable {}
+    constructor(address NFTContractAddress) payable {
+        NFT= PatentNFT(NFTContractAddress);
+    }
+
+    function _exists(uint patentID) public returns (bool){
+        return _patents[patentID].filingDate!=0;
+    }
+
+    function ownerOf(uint patentID) public returns (address){
+        return _patents[patentID].inventor;
+    }
 
     // Patent Registry Functions
 
     function registerPatent(
         string memory _title,
         string memory _description,
-        string[] memory _documents
+        string[] memory _documents,
+        string calldata tokenURI 
     ) public {
         uint256 patentId = _patentIdCounter;
         _patentIdCounter++;
@@ -96,14 +106,13 @@ contract PatentRegistryMarketPlace {
             false
         );
 
-        NFT.mint(msg.sender, patentId);
+        NFT.mint(msg.sender, patentId , tokenURI);
     }
 
     function verifyPatent(uint256 _patentId) public payable {
-        require(NFT.exists(NFT.patentIdToTokenId(_patentId)),"Patent does not exist"
-        );
+        require(_exists(_patentId), "Patent does not exist");
         require(
-            NFT.ownerOf(NFT.patentIdToTokenId(_patentId)) == msg.sender,
+            ownerOf(_patentId) == msg.sender,
             "You are not the patent owner"
         );
         require(
@@ -114,14 +123,11 @@ contract PatentRegistryMarketPlace {
         _patents[_patentId].verified = true;
     }
 
-    function getPatent(uint256 _patentId) public view returns (Patent memory) {
-        require(NFT.exists(NFT.patentIdToTokenId(_patentId)),"Patent does not exist"
-        );
-        
+    function getPatent(uint256 _patentId) public  returns (Patent memory) {
+        require(_exists(_patentId), "Patent does not exist");
         return _patents[_patentId];
     }
-
-    // Patent Marketplace
+   // Patent Marketplace
 
     function createLicenseAgreement(
         uint256 _patentId,
@@ -250,11 +256,4 @@ contract PatentRegistryMarketPlace {
         dispute.status = DisputeStatus.Resolved;
         emit DisputeResolved(_disputeId);
     }
-
-    // Patent Expiration
-    // ...
-
-    // Patent Rating and Review
-    // ...
-
 }

@@ -18,7 +18,7 @@ contract PatentNFT is ERC721, ERC721URIStorage {
 
     /// can the mint function be called by anyone ??
     // where is the token uri ??
-    function mint(address _to, uint256 _patentId) external {
+    function mint(address _to, uint256 _patentId , string calldata tokenURIString)  external {
         require(
             patentIdToTokenId[_patentId] == 0,
             "Patent already minted as NFT"
@@ -30,7 +30,7 @@ contract PatentNFT is ERC721, ERC721URIStorage {
         tokenIdToPatentId[tokenId] = _patentId;
         patentIdToTokenId[_patentId] = tokenId;
         _safeMint(_to, tokenId);
-        _setTokenURI(tokenId, string(abi.encodePacked(tokenId)));
+        _setTokenURI(tokenId, tokenURIString);
     }
 
     function _burn(
@@ -42,21 +42,23 @@ contract PatentNFT is ERC721, ERC721URIStorage {
     function _baseURI() internal pure override returns (string memory) {
         return "ipfs://";
     }
+
     function tokenURI(
         uint256 tokenId
-    ) public view override(ERC721,ERC721URIStorage)  returns (string memory) {
+    ) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
-     function supportsInterface(bytes4 interfaceId) public view  override(ERC721,ERC721URIStorage) returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721, ERC721URIStorage) returns (bool) {
         return
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
-    function exists(uint256 tokenId) public view returns (bool)
-    {
+    function exists(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);
     }
 }

@@ -14,8 +14,10 @@ import {
 	arbitrumGoerli,
 	polygonZkEvm,
 	polygonZkEvmTestnet,
+	sepolia,
 } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
+import { infuraProvider } from "wagmi/providers/infura"
 import { publicProvider } from "wagmi/providers/public";
 import MainLayout from "../layout/mainLayout";
 import { useRouter } from "next/router";
@@ -29,15 +31,17 @@ const { chains, provider } = configureChains(
 		optimism,
 		optimismGoerli,
 		arbitrum,
-    arbitrumGoerli,
-    polygonZkEvm,
-    polygonZkEvmTestnet
+		arbitrumGoerli,
+		polygonZkEvm,
+		polygonZkEvmTestnet,
+		sepolia
 	],
-	[alchemyProvider({ apiKey: process.env.ALCHEMY_API_KEY }), publicProvider()]
+	[infuraProvider({apiKey: process.env.INFURA_API_KEY}), publicProvider(), ]
 );
 
 const { connectors } = getDefaultWallets({
 	appName: "My Alchemy DApp",
+	projectId:"0dda8090aa0c58882bb32b9eacc0277c",
 	chains,
 });
 

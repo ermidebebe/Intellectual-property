@@ -4,7 +4,7 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar}>
       <p>
-        <a href="#" target={"_blank"}>IP Marketplace</a>
+        <a href="http://localhost:3000" >IP Marketplace</a>
       </p>
 
       <ConnectButton></ConnectButton>
