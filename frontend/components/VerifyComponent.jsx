@@ -1,5 +1,5 @@
 import styles from "../styles/InstructionsComponent.module.css";
-import { getContract, getToken } from "../assets/utils"
+import { getContract} from "../assets/utils"
 import Router, { useRouter } from "next/router";
 import { useRef } from 'react';
 import { useSigner } from "wagmi";
@@ -48,10 +48,11 @@ async function Request(amount, signer, setLoading, setData) {
     if (signer) {
         try {
             let contract = getContract()
-            const tx = await contract.connect(signer).purchaseTokens({
-                value: ethers.utils.parseEther(amount).div(TOKEN_RATIO),
+            const tx = await contract.connect(signer).verifyPatent(amount,{
+                value: ethers.utils.parseEther("1"),
             });
             const receipt = await tx.wait();
+            console.log(receipt.transactionHash)
             setData(receipt.transactionHash)
 
         }
