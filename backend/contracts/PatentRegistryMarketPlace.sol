@@ -200,7 +200,8 @@ contract PatentRegistryMarketPlace {
         uint256 _patentId,
         address _respondent,
         string calldata _description
-    ) public {
+    ) public payable  {
+        require(msg.value == 1 ether , "Please stake 1 ether to create a dispute ");
         totalDisputes++;
         Dispute storage dispute = disputes[totalDisputes];
         dispute.patentId = _patentId;
@@ -250,8 +251,15 @@ contract PatentRegistryMarketPlace {
         );
         if (dispute.upVoteCount > dispute.downVoteCount) {
             // add the thing that you want to do when the dispute initator has won
+            delete _patents[disputes[_disputeId].patentId];
+            (bool success , ) = payable(disputes[_disputeId].initiator).call{value : 1 ether}("");
+            require(success , "transcation failed");
+
+
         } else {
             // add the condition where the respondant has won
+            (bool success , ) = payable(disputes[_disputeId].respondent).call{value : 1 ether}("");
+            require(success , "transcation failed");
         }
         dispute.status = DisputeStatus.Resolved;
         emit DisputeResolved(_disputeId);
