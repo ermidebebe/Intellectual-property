@@ -18,7 +18,11 @@ contract PatentNFT is ERC721, ERC721URIStorage {
 
     /// can the mint function be called by anyone ??
     // where is the token uri ??
-    function mint(address _to, uint256 _patentId , string calldata tokenURIString)  external {
+    function mint(
+        address _to,
+        uint256 _patentId,
+        string calldata tokenURIString
+    ) external {
         require(
             patentIdToTokenId[_patentId] == 0,
             "Patent already minted as NFT"
