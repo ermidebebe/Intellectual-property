@@ -77,11 +77,11 @@ contract PatentRegistryMarketPlace {
         NFT= PatentNFT(NFTContractAddress);
     }
 
-    function _exists(uint patentID) public returns (bool){
+    function _exists(uint patentID) public view returns (bool){
         return _patents[patentID].filingDate!=0;
     }
 
-    function ownerOf(uint patentID) public returns (address){
+    function ownerOf(uint patentID) public view  returns (address){
         return _patents[patentID].inventor;
     }
 
@@ -124,6 +124,7 @@ contract PatentRegistryMarketPlace {
     }
 
     function getPatent(uint256 _patentId) public  returns (Patent memory) {
+        require(!isExpired(_patentId) , "The patent is expired");
         require(_exists(_patentId), "Patent does not exist");
         return _patents[_patentId];
     }
@@ -214,6 +215,7 @@ contract PatentRegistryMarketPlace {
     }
 
     function upVoteDispute(uint _disputeID) public {
+        
         Dispute storage dispute = disputes[_disputeID];
         require(!dispute.upVotes[msg.sender], "Already upvoted on the Dispute");
         if (dispute.downVotes[msg.sender]) {
@@ -264,4 +266,16 @@ contract PatentRegistryMarketPlace {
         dispute.status = DisputeStatus.Resolved;
         emit DisputeResolved(_disputeId);
     }
+
+    function isExpired(uint patentID) public view returns(bool) {
+        require(_exists(patentID) , "The patent doesnt exist");
+        return block.timestamp <  _patents[patentID].filingDate + 5*365 days ; 
+    }
+
+    function restartPatent(uint patentID) public {
+        require(isExpired(patentID) , "The Patent hasnt expired yet");
+        _patents[patentID].filingDate = block.timestamp;
+    }
+
+
 }
