@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import {PatentNFT} from "./PatentNFT.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract PatentRegistryMarketPlace {
     using Counters for Counters.Counter;
@@ -99,9 +100,10 @@ contract PatentRegistryMarketPlace {
     }
 
     function verifyPatent(uint256 _patentId) public payable {
-        require(_exists(_patentId), "Patent does not exist");
+        require(NFT.exists(NFT.patentIdToTokenId(_patentId)),"Patent does not exist"
+        );
         require(
-            ownerOf(_patentId) == msg.sender,
+            NFT.ownerOf(NFT.patentIdToTokenId(_patentId)) == msg.sender,
             "You are not the patent owner"
         );
         require(
@@ -113,10 +115,13 @@ contract PatentRegistryMarketPlace {
     }
 
     function getPatent(uint256 _patentId) public view returns (Patent memory) {
-        require(_exists(_patentId), "Patent does not exist");
+        require(NFT.exists(NFT.patentIdToTokenId(_patentId)),"Patent does not exist"
+        );
+        
         return _patents[_patentId];
     }
-   // Patent Marketplace
+
+    // Patent Marketplace
 
     function createLicenseAgreement(
         uint256 _patentId,
@@ -251,4 +256,5 @@ contract PatentRegistryMarketPlace {
 
     // Patent Rating and Review
     // ...
+
 }

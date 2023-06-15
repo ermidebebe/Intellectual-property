@@ -30,7 +30,7 @@ contract PatentNFT is ERC721, ERC721URIStorage {
         tokenIdToPatentId[tokenId] = _patentId;
         patentIdToTokenId[_patentId] = tokenId;
         _safeMint(_to, tokenId);
-        _setTokenURI(tokenId, tokenId.toString());
+        _setTokenURI(tokenId, string(abi.encodePacked(tokenId)));
     }
 
     function _burn(
@@ -44,7 +44,19 @@ contract PatentNFT is ERC721, ERC721URIStorage {
     }
     function tokenURI(
         uint256 tokenId
-    ) public view override returns (string memory) {
+    ) public view override(ERC721,ERC721URIStorage)  returns (string memory) {
         return super.tokenURI(tokenId);
+    }
+
+     function supportsInterface(bytes4 interfaceId) public view  override(ERC721,ERC721URIStorage) returns (bool) {
+        return
+            interfaceId == type(IERC721).interfaceId ||
+            interfaceId == type(IERC721Metadata).interfaceId ||
+            super.supportsInterface(interfaceId);
+    }
+
+    function exists(uint256 tokenId) public view returns (bool)
+    {
+        return _exists(tokenId);
     }
 }
